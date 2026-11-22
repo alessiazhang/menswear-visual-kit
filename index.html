@@ -540,11 +540,11 @@ footer{padding:30px 24px 8px;font-family:var(--sans);font-size:11px;letter-spaci
 #aim .wrap{max-width:1440px}
 #aim .bar{background:rgba(255,255,255,.97);border-bottom:1px solid var(--line);box-shadow:0 2px 12px rgba(25,37,58,.05)}
 #aim .brand{font-family:var(--sans);font-weight:800;color:var(--ink)}
-#aim .tabs a{border-radius:10px;border:1px solid var(--line);background:#fff;color:var(--ink);
+#aim .tabs a{border-radius:10px;border:1px solid #FFD9B8;background:#fff;color:var(--ink);
   font-weight:700;font-size:14px;margin-right:8px;border-left-width:1px!important;box-shadow:0 1px 5px rgba(20,30,50,.06)}
 #aim .tabs a:first-child,#aim .tabs a:last-child{border-radius:10px}
-#aim .tabs a:hover{background:#fff6ee;color:var(--accent)}
-#aim .tabs a.on{background:var(--accent);border-color:var(--accent);color:#fff;box-shadow:0 6px 16px rgba(232,93,4,.24)}
+#aim .tabs a:hover{background:#FFF9F3;color:#E85D04;border-color:#FFC894}
+#aim .tabs a.on{background:#FB7701;border-color:#FB7701;color:#fff;box-shadow:0 5px 14px -8px rgba(251,119,1,.6)}
 #aim .sec-h h2{font-family:var(--sans);font-weight:800;font-size:22px;color:var(--ink)}
 #aim .mast h1{font-family:var(--sans);font-weight:800;color:var(--ink)}
 #aim .mast{border-bottom:1px solid var(--line)}
@@ -814,15 +814,22 @@ nav .g>a i,nav .gtop>a i{display:none!important}
 /* 子分类 tab（原侧栏子 tab 移入正文） */
 .subtabs{display:flex;flex-wrap:wrap;gap:9px;padding:2px 0 16px;margin-bottom:20px;
   border-bottom:1px solid var(--line)}
-.stab{border:1px solid var(--line);background:#fff;color:#5b6472;font-family:var(--sans);
+.stab{border:1px solid #FFD9B8;background:#fff;color:#3d4657;font-family:var(--sans);
   font-size:13.5px;font-weight:700;padding:9px 17px;border-radius:999px;cursor:pointer;
   line-height:1.2;transition:.16s;letter-spacing:.01em}
-.stab:hover{border-color:#ffc495;color:var(--accent);background:#fff8f3}
-.stab.on{background:linear-gradient(135deg,#ff8a3d,#fb7701 60%,#ee6600);color:#fff;
-  border-color:transparent;box-shadow:0 8px 18px -10px rgba(232,93,4,.85)}
+.stab:hover{border-color:#FFC894;color:#E85D04;background:#FFF9F3}
+.stab.on{background:#FB7701;color:#fff;border-color:#FB7701;
+  box-shadow:0 6px 14px -8px rgba(251,119,1,.6)}
 .subdesc{font-size:13px;line-height:1.9;color:#5b6472;margin:-6px 0 20px}
 .subdesc i{font-style:normal;color:var(--accent);font-weight:700}
 .sub{margin-bottom:6px}
+
+/* 版块内子内容切换：只显示当前选中分类，切换栏吸顶常驻，随时可继续点筛选 */
+.sub.suboff{display:none!important}
+.subtabs{position:sticky;top:0;z-index:45;background:#fff;
+  padding-top:10px;margin-top:-10px;transition:box-shadow .2s}
+.subtabs.stuck{box-shadow:0 6px 14px -12px rgba(23,32,51,.45)}
+@media(max-width:1080px){.subtabs{top:44px}}
 
 /* 卡片编号不再显示 */
 .card .no{display:none!important}
@@ -901,7 +908,7 @@ body{padding-bottom:calc(var(--disch,44px) + 12px)}
 <div class="wrap">
 <aside>
   <div class="brand">
-    <div class="blogo">POD</div>
+    <div class="blogo" style="font-size:20px;letter-spacing:0">T</div>
     <div class="btxt"><b>男装视觉经验分享</b></div>
   </div>
   <nav id="nav"></nav>
@@ -1232,20 +1239,46 @@ function shortDesc(t){
   return t;
 }
 const TABBARS=[...document.querySelectorAll('#content .subtabs')];
+/* 子内容切换 = 就地过滤：只显示当前分类，其余隐藏，并让本版块停在视口顶部 */
+function applySubFilter(sec,key){
+  sec.dataset.filter=key;
+  sec.querySelectorAll('.sub').forEach(s=>{
+    s.classList.toggle('suboff', key!=='*' && s.dataset.s!==key);
+  });
+}
+function scrollToSectionTop(sec){
+  const mbar=document.querySelector('.mbar');
+  const off=(window.innerWidth<=1080 && mbar && getComputedStyle(mbar).display!=='none')?mbar.offsetHeight:0;
+  /* 以版块本身为基准（不受吸顶影响），切换后该版块整体回到视口顶部 */
+  const y=sec.getBoundingClientRect().top+window.scrollY-off;
+  window.scrollTo({top:Math.max(0,y),behavior:'smooth'});
+}
 TABBARS.forEach(bar=>{
   const sec=bar.closest('section');
+  sec.dataset.filter='*';
   bar.addEventListener('click',ev=>{
     const btn=ev.target.closest('.stab'); if(!btn) return;
     bar.querySelectorAll('.stab').forEach(x=>x.classList.toggle('on',x===btn));
-    const key=btn.dataset.s;
-    const target = key==='*' ? sec : sec.querySelector('.sub[data-s="'+key+'"]');
-    if(target) target.scrollIntoView({behavior:'smooth',block:'start'});
+    applySubFilter(sec, btn.dataset.s);
+    requestAnimationFrame(()=>scrollToSectionTop(sec));
   });
 });
+/* 筛选栏吸顶时给一点阴影，明确当前正在浏览的分类 */
+function markStuck(){
+  TABBARS.forEach(bar=>{
+    const r=bar.getBoundingClientRect();
+    bar.classList.toggle('stuck', r.top<= (window.innerWidth<=1080?46:2) && r.bottom>60);
+  });
+}
+window.addEventListener('scroll',markStuck,{passive:true});
+window.addEventListener('resize',markStuck);
+markStuck();
 function spyTabs(){
   const line=140;
   TABBARS.forEach(bar=>{
     const sec=bar.closest('section');
+    /* 已按分类过滤时，当前分类由点击决定，不被滚动反推覆盖 */
+    if(sec.dataset.filter && sec.dataset.filter!=='*') return;
     const r=sec.getBoundingClientRect();
     if(r.bottom<0||r.top>window.innerHeight) return;
     let active='*';
@@ -1286,7 +1319,7 @@ function copyP(e,el){
 
 /* lightbox */
 function openLb(img,title,ai){
-  cur=[...document.querySelectorAll('.card')].filter(c=>c.style.display!=='none').map(c=>{
+  cur=[...document.querySelectorAll('.card')].filter(c=>c.style.display!=='none'&&c.offsetParent!==null).map(c=>{
     const im=c.querySelector('img.main')||c.querySelector('img');
     return {src:im.getAttribute('src'), title:c.querySelector('h4').textContent, ai:c.dataset.ai==='1'};
   });
