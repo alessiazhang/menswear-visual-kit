@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="theme-color" content="#fb7701">
 <meta name="format-detection" content="telephone=no">
-<title>POD 男装视觉展示手册 · 展示方式拆解</title>
+<title>印花男装视觉优化</title>
 <style>
 *{box-sizing:border-box}
 :root{
@@ -1097,10 +1097,30 @@ main#content{padding-bottom:0!important}
   #nav .subs a{font-size:13px!important;padding:10px!important;margin-bottom:5px!important}
 }
 </style>
+
+<style id="fix1127">
+/* 数字徽章与标题文字间距 */
+#aim .frow>.fk>b .fkno{margin-right:9px}
+#aim .lbl .fkno{margin-right:8px}
+/* 生成主图：人模分组下的小标签（族裔 / 年龄 / 体型） */
+#aim .frow>.fc>.sub{font-size:12px;font-weight:600;color:#3f4a5e;letter-spacing:.02em;margin:0 0 7px}
+#aim .frow>.fc>.chips+.sub{margin-top:13px}
+#aim .frow>.fc>.sub:first-child{margin-top:0}
+/* 提示词上方：本次选择摘要 */
+#aim .pvsum{margin:0 0 8px;font-family:var(--nsans);font-size:11.5px;line-height:1.7;color:var(--nink2);
+  background:#fff7ef;border:1px dashed #ffd0a8;border-radius:6px;padding:7px 10px}
+#aim .pvsum b{color:#fb7701;font-weight:700;margin-right:6px}
+/* 效果预览：场景直接压到人模上（模特本身就是浅底棚拍，用正片叠底让背景透出场景） */
+#aim .posefig .imgwrap{background-color:#eef1f6;background-size:cover;background-position:center;background-repeat:no-repeat}
+#aim .posefig .imgwrap>img{position:relative;z-index:1;border:0;mix-blend-mode:multiply;
+  filter:brightness(1.05) contrast(1.03) saturate(1.05)}
+#aim .posefig .imgwrap::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
+  background:radial-gradient(125% 85% at 50% 28%,rgba(0,0,0,0) 48%,rgba(0,0,0,.18) 100%)}
+</style>
 </head>
 <body>
 <div class="mbar">
-  <div class="mk">男装视觉优化</div>
+  <div class="mk">印花男装视觉优化</div>
   <button class="mbtn" type="button" aria-label="打开目录" onclick="toggleNav(1)">☰ 目录</button>
 </div>
 <div class="mask" id="mask" onclick="toggleNav(0)"></div>
@@ -1109,7 +1129,7 @@ main#content{padding-bottom:0!important}
 <aside>
   <div class="brand">
     <div class="blogo" style="font-size:20px;letter-spacing:0">T</div>
-    <div class="btxt"><b>男装视觉优化</b></div>
+    <div class="btxt"><b>印花男装视觉优化</b></div>
   </div>
   <nav id="nav"></nav>
   <div class="side-contact">
@@ -1217,7 +1237,8 @@ main#content{padding-bottom:0!important}
   <div class="sec-h"><span class="n">03</span><h2>生成主图</h2><span class="sub">ONE MAIN IMAGE · CN + EN</span></div>
   <div class="hero">
     <div>
-      <div class="phead"><b>主图AI提示词</b><span class="phr"><span class="langsw" data-langsw="p3"><i data-lv="cn">中文</i><i data-lv="en">英文</i></span><span class="mini" id="eCode">未就绪</span></span></div>
+      <div class="phead"><b>主图AI提示词</b><span class="phr"><span class="langsw" data-langsw="p3"><i data-lv="cn">中文</i><i data-lv="en">英文</i></span></span></div>
+      <div class="pvsum" id="mainSum">—</div>
       <div class="pbox" id="mainOut" style="max-height:420px">右边选项任意调整，这里实时重写。</div>
       <div style="margin-top:8px;display:flex;gap:9px;align-items:center;flex-wrap:wrap">
         <button class="cbtn" data-cp="mainOut">复制当前这段</button>
@@ -1225,10 +1246,10 @@ main#content{padding-bottom:0!important}
         <button class="cbtn ghost" id="cpCn">复制中文</button>
         <span class="mini" style="color:var(--nmute);font-size:11.5px">中英文稿最后都已带负面词，复制一段就够</span>
       </div>
-      <div class="phead" style="margin-top:18px"><b>姿势与取景示意图</b><span class="mini" id="poseAll">同一模特 · 同一光线 · 点缩略图切换</span></div>
+      <div class="phead" style="margin-top:18px"><b>效果预览 · 人模与场景</b><span class="mini" id="poseAll">同一模特 · 同一光线 · 点缩略图切换</span></div>
       <div class="posebox">
         <div class="posefig">
-          <div class="imgwrap"><img id="poseImg" alt="姿势示意">
+          <div class="imgwrap" id="pvWrap"><img id="poseImg" alt="姿势示意">
           <div class="cropmask" id="cropMask"><i class="cmT"></i><i class="cmB"></i><div class="cmline" id="cmLine"></div><div class="cmtag" id="cmTag">取景</div></div></div>
           <div class="fcap" id="poseCap">—</div>
         </div>
@@ -1236,10 +1257,6 @@ main#content{padding-bottom:0!important}
       </div>
     </div>
     <div>
-      <div class="frow fkwide">
-        <div class="fk"><b class="fkt">快筛搭配</b><span class="lbhint">存 3 组常拍组合，一键回到这里</span></div>
-        <div class="fc chips" id="qSlots"></div>
-      </div>
       <div class="frow">
         <div class="fk"><b><span class="fkno">1</span>站点</b></div>
         <div class="fc chips" id="cSite"><div class="chip dis">正在加载站点…</div></div>
@@ -1249,8 +1266,9 @@ main#content{padding-bottom:0!important}
         <div class="fc chips" id="cCat"><div class="chip dis">正在加载品类…</div></div>
       </div>
       <div class="frow">
-        <div class="fk"><b><span class="fkno">3</span>人模 · 族裔</b></div>
+        <div class="fk"><b><span class="fkno">3</span>人模</b></div>
         <div class="fc" style="display:block">
+          <div class="sub">族裔</div>
           <div class="chips" id="cEth"><div class="chip dis">正在加载人模…</div></div>
           <div class="sub">年龄</div>
           <div class="chips" id="cAge"></div>
@@ -1277,11 +1295,7 @@ main#content{padding-bottom:0!important}
         </div>
       </div>
       <div class="frow">
-        <div class="fk"><b><span class="fkno">7</span>情绪</b></div>
-        <div class="fc chips" id="cEmo"><div class="chip dis">正在加载情绪…</div></div>
-      </div>
-      <div class="frow">
-        <div class="fk"><b><span class="fkno">8</span>场景</b></div>
+        <div class="fk"><b><span class="fkno">7</span>场景</b></div>
         <div class="fc" style="display:block">
           <div class="chips" id="cScene"><div class="chip dis">正在加载场景…</div></div>
           <div class="stylehint" id="cSceneNote" style="display:none"></div>
@@ -2413,11 +2427,10 @@ function renderScn(){
   $('scCode').textContent = c.n + ' / ' + scnNow().t;
 
   const s = scnNow();
-  const zone = `<span class="mk">无人物空景 <b>2:3</b></span><span class="mk">${avail.length} 套可选</span>`;
+  const zone = `<span class="mk">无人物空景 <b>2:3</b></span>`;
   const thumbs = avail.map(i=>`<img src="${SCNIMG[SCN[i].id]||''}" data-sc2="${i}" class="${PS.sc===i?'on':''}" title="${SCN[i].t}" alt="${SCN[i].t}">`).join('');
   $('scStage').innerHTML = `
-    <div class="mkt"><div class="mkline"><span class="mt">${s.t} · ${s.en}</span>${zone}</div>
-      <div class="mknote">示意图为同一套提示词生成的空景，实际按 2:3 竖幅出图</div></div>
+    <div class="mkt"><div class="mkline"><span class="mt">${s.t} · ${s.en}</span>${zone}</div></div>
     <div class="fwrap"><img src="${SCNIMG[s.id]||''}" alt=""></div>
     <div class="fcap"><b>${s.t}</b><br><span>${s.why}</span></div>
     <div class="thumbs" style="max-height:470px;overflow:auto">${thumbs}</div>`;
@@ -3277,9 +3290,6 @@ function enPrompt(){
   body = body.charAt(0).toUpperCase()+body.slice(1);
   return 'Vertical 2:3 framing, ' + camLineEn() + '\n\n'
    + (frameLockEn() ? frameLockEn() + '\n\n' : '')
-   + refLockEn() + '\n\n'
-   + catNote + '\n\n'
-   + (custStyleCn() ? 'STYLE — ' + CUS_TAG_EN + custStyleCn() + '\n\n' : '')
    + 'SCENE — ' + sceneSiteEn(sc.enT) + stripCam(body) + '\n\n'
    + 'MODEL — ' + persona3En() + '\n'
    + 'He is the only person in frame. He ' + poseLineEn() + '.\n'
@@ -3287,7 +3297,9 @@ function enPrompt(){
    + (SEATED_POSE(P3.pose) ? 'He is seated throughout — he is not standing, not walking and not leaning against a wall. ' + seatAnchorEn() + '\n' : '')
    + (backVisible() ? 'The camera stays behind him as described in the framing below; do not rotate him towards the camera.\n' : '')
    + 'He wears ' + outfitEn() + ', fitted as it reads in the reference image.' + lowerPoseNoteEn() + '\n\n'
-   + 'MOOD / EXPRESSION — ' + emoLineEn() + '\n'
+   + refLockEn() + '\n\n'
+   + catNote + '\n\n'
+   + (custStyleCn() ? 'STYLE — ' + CUS_TAG_EN + custStyleCn() + '\n\n' : '')
    + 'FRAMING — ' + frameEn() + '\n\n'
    + selfCheckEn() + '\n\n'
    + guardsEn() + '\n\n'
@@ -3344,9 +3356,6 @@ function cnPrompt(){
   const catNote = '这是男装里的「' + catNow().n + '」，品类只用来判断这件衣服干什么穿，不要用它去编造款式细节。';
   return '画幅 2:3 竖图（1696×2528），' + camLineCn() + '\n\n'
    + (frameLockCn() ? frameLockCn() + '\n\n' : '')
-   + refLockCn() + '\n\n'
-   + catNote + '\n\n'
-   + (custStyleCn() ? '风格取向——' + custStyleCn() + '\n\n' : '')
    + '场景——' + sceneSiteCn(sc.cnT) + stripCamCn(stripEmptyCn(sc.cnT)) + '\n\n'
    + '人模——' + persona3Cn() + '\n'
    + '画面中只有他一个人。他' + poseLineCn() + '。\n'
@@ -3354,7 +3363,9 @@ function cnPrompt(){
    + (SEATED_POSE(P3.pose) ? '全程保持坐姿：不是站立、不是行走、也不是靠墙。' + seatAnchorCn() + '\n' : '')
    + (backVisible() ? '相机保持在他身后（见下方取景），不要把他转向镜头。\n' : '')
    + '他穿的正是' + outfitCn() + '，按参考图里的样子合身穿着。' + lowerPoseNoteCn() + '\n\n'
-   + '情绪——' + emoLineCn() + '\n'
+   + refLockCn() + '\n\n'
+   + catNote + '\n\n'
+   + (custStyleCn() ? '风格取向——' + custStyleCn() + '\n\n' : '')
    + '取景——' + frameCn().replace(/。$/,'') + '。\n\n'
    + selfCheckCn() + '\n\n'
    + guardsCn() + '\n\n'
@@ -3407,7 +3418,6 @@ function renderP3(){
     const cstP = POSES.find(x=>x.id===p&&x.cst);
     return `<div class="chip${P3.pose===p?' on':''}${isCat?' rec':''}${cstP?' cst':''}" data-p3="${p}">${posOf(p).name}${isCat?'<em>常用</em>':''}${cstP?'<i class="cdel" data-cs-del="pose:'+p+'">×</i>':''}</div>`;
   }).join('');
-  $('cPose').insertAdjacentHTML('beforeend', `<div class="chip cad" data-cs-add="pose">＋ 自定义</div>`);
   $('cPose').querySelectorAll('#aim [data-p3]').forEach(el=>el.onclick=()=>{ P3.pose=el.dataset.p3; renderP3(); });
   const pn = $('cPoseNote');
   if(pn){
@@ -3441,9 +3451,6 @@ function renderP3(){
       frNote.textContent = '构图优先于姿势：换了构图，后面的取景描述就按这个来写，姿势只留下动作本身。';
     } else frNote.style.display='none';
   }
-  $('cEmo').innerHTML = EMO.map(m=>`<div class="chip${P3.emo===m.id?' on':''}${m.cst?' cst':''}" data-m="${m.id}">${m.n}${m.cst?'<i class="cdel" data-cs-del="emo:'+m.id+'">×</i>':''}</div>`).join('')
-    + `<div class="chip cad" data-cs-add="emo">＋ 自定义</div>`;
-  $('cEmo').querySelectorAll('#aim [data-m]').forEach(el=>el.onclick=()=>{ P3.emo=el.dataset.m; renderP3(); });
 
   // 场景：风格 × 品类 全枚举
   const poolObj = scenePool(), pool = poolObj.list;
@@ -3453,7 +3460,6 @@ function renderP3(){
     const s=SCN[i];
     return `<div class="chip${P3.scene===i?' on':''}${s.cats[P3.cat]==='●'?' pri':''}${s.cst?' cst':''}" data-sc3="${i}">${s.t}${s.cst?'<i class="cdel" data-cs-del="scene:'+s.id+'">×</i>':''}</div>`;
   }).join('') || `<div class="mini" style="padding:6px 0;color:var(--nmute)">这个风格下没有适配本品类的场景，换一个风格或品类看看。</div>`;
-  $('cScene').insertAdjacentHTML('beforeend', `<div class="chip cad" data-cs-add="scene">＋ 自定义</div>`);
   $('cScene').querySelectorAll('#aim [data-sc3]').forEach(el=>el.onclick=()=>{ P3.scene=+el.dataset.sc3; renderP3(); });
   const sNote = $('cSceneNote');
   if(sNote){
@@ -3465,10 +3471,21 @@ function renderP3(){
 
 
   const ang = POSE_ANG[P3.pose] || 'full';
-  const pm = posImg(P3.pose);
-  $('poseImg').src = pm || IMG(P3.eth, ang);
+  const pvAng = ({mid:'half', crouch:'sit'})[ang] || ang;
+  const bigImg = $('poseImg');
+  const pm = IMG(P3.eth, pvAng, P3.age, P3.build) || posImg(P3.pose);
+  const fbImg = posImg(P3.pose);
+  bigImg.onerror = function(){ this.onerror=null; if(fbImg && this.getAttribute('src')!==fbImg) this.src = fbImg; };
+  if(pm) bigImg.src = pm;
   $('poseImg').alt = posOf(P3.pose).name;
   $('poseCap').innerHTML = '<b>'+posOf(P3.pose).name+'</b> · '+framePlan().cn.split('：')[0];
+  const sNow = scNow();
+  const pvWrap = $('pvWrap');
+  if(pvWrap && SCNIMG[sNow.id]) pvWrap.style.backgroundImage = 'url("'+SCNIMG[sNow.id]+'")';
+  const ageObj = AGES.find(a=>a.id===P3.age) || AGES[0];
+  const bObj = BUILDS.find(b=>b.id===P3.build) || BUILDS[0];
+  const bShort = bObj.name.split(' ')[0];
+  if($('poseAll')) $('poseAll').textContent = ethOf(P3.eth).short+' / '+ageObj.short+' / '+bShort;
   const pg = $('poseGrid');
   if(pg){
     pg.innerHTML = POSES.map(x=>{
@@ -3477,12 +3494,16 @@ function renderP3(){
     }).join('');
     pg.querySelectorAll('#aim [data-pg]').forEach(el=>el.onclick=()=>{ P3.pose=el.dataset.pg; renderP3(); });
   }
+  const sumTxt = [SITE.find(s=>s.id===P3.site).n, catNow().n, ethOf(P3.eth).short,
+    (AGES.find(a=>a.id===P3.age)||AGES[0]).short, (BUILDS.find(b=>b.id===P3.build)||BUILDS[0]).name.split(' ')[0],
+    (STYLES.find(x=>x.id===P3.style)||{}).n||'全部', posOf(P3.pose).name,
+    (CROPS.find(f=>f.id===P3.frame)||{n:'自动'}).n, scNow().t].join(' · ');
+  if($('mainSum')) $('mainSum').innerHTML = '<b>本次选择</b>' + sumTxt;
   $('mainOut').textContent = (LANG.p3==='cn') ? cnPrompt() : enPrompt();
   paintLang();
   try{ paintCrop(); }catch(e){}
   try{ renderQSlots(); }catch(e){}
-  $('eCode').textContent = catNow().n + ' / ' + (sty?sty.n:'全部') + ' / ' + SITE.find(s=>s.id===P3.site).n + ' / ' + scNow().t
-    + ' · ' + pool.length + ' 个场景可选' + (poolObj.fallback ? '（该风格下本品类无适配场景，已退回全部可用场景）' : '');
+  if($('eCode')) $('eCode').textContent = '';
 }
 
 
@@ -3535,7 +3556,7 @@ function qSaveAll(a){ try{ localStorage.setItem(QK, JSON.stringify(a)); }catch(e
 let QSLOTS = qLoad();
 function qSnapshot(){
   return {site:P3.site, cat:P3.cat, eth:P3.eth, age:P3.age, build:P3.build, style:P3.style,
-          pose:P3.pose, frame:P3.frame, emo:P3.emo, scene:P3.scene};
+          pose:P3.pose, frame:P3.frame, scene:P3.scene};
 }
 function qDescriptor(st){
   try{
@@ -3576,7 +3597,7 @@ function qPromptSave(i){
   qEditIdx = i;
   const m = $('qModal'); if(!m) return;
   $('qmTitle').textContent = '存为快筛 ' + (i+1);
-  $('qmInfo').textContent = '会把当前这一整套存下来：站点、品类、人模（族裔/年龄/体型）、款式风格、姿势、构图、情绪、场景。下次点一下，一次回到这套配置。';
+  $('qmInfo').textContent = '会把当前这一整套存下来：站点、品类、人模（族裔/年龄/体型）、款式风格、姿势、构图、场景。下次点一下，一次回到这套配置。';
   $('qmName').value = '';
   $('qmName').placeholder = (function(){ try{ return qDescriptor(qSnapshot()).split(' · ').slice(0,3).join('·'); }catch(e){ return '例：长裤·街头·行走'; } })();
   m.classList.add('on');
